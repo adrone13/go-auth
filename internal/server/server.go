@@ -14,6 +14,7 @@ type Server struct {
 	port int
 }
 
+// TODO: implement request logging (similar to middleware in Chi)
 func NewServer() *http.Server {
 	// TODO: implement Config service to manage env variables
 	port, _ := strconv.Atoi(os.Getenv("PORT"))

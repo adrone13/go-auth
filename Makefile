@@ -7,6 +7,7 @@ build:
 
 # Run the application
 run:
+	@echo "Starting app..."
 	@go run cmd/auth/main.go
 
 # Test the application
