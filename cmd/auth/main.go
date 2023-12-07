@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
-
 	"auth/internal/logger"
 	"auth/internal/server"
+	"fmt"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
