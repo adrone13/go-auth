@@ -6,22 +6,18 @@ import (
 
 	"auth/internal/config"
 	"auth/internal/jwt"
-	"auth/internal/user"
 )
 
 /*
 	TODO:
+	- move JWT creation into separate library (WIP)
 	- add DB implementation
-	- move JWT creation into separate library
 	- implement registration
 	- implement refresh token storage in sessions
 	- implement JWT refreshing
 	- implement logout and JWT invalidation (through cache)
+	- implement HTTP wrappers to cut boilerplate code
 */
-
-type UserRepository interface {
-	FindByEmail(email string) *user.User
-}
 
 type Credentials struct {
 	Email    string
@@ -34,11 +30,11 @@ type Auth struct {
 }
 
 // Controller constructor Constructor
-type LoginController struct {
+type LogInUseCase struct {
 	UserRepository UserRepository
 }
 
-func (c *LoginController) Execute(cred Credentials) (*Auth, error) {
+func (c *LogInUseCase) Execute(cred Credentials) (*Auth, error) {
 	user := c.UserRepository.FindByEmail(cred.Email)
 	if user == nil {
 		return nil, &UserNotFoundError{}
@@ -52,15 +48,25 @@ func (c *LoginController) Execute(cred Credentials) (*Auth, error) {
 
 	secret := config.GetString("JWT_SECRET")
 	ttl := config.GetInt("JWT_TTL")
-	claims := jwt.BuildClaims().
-		AddIss("auth").
-		AddExp(time.Now().Add(time.Second * time.Duration(ttl)).Unix()).
-		AddAud("todo").
-		AddSub(user.Id).
-		AddName(user.FullName).
-		AddRoles([]string{"TODO"})
 
-	token := jwt.Sign(*claims, secret)
+	claims := jwt.Claims{
+		Iss:   "auth",
+		Exp:   time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
+		Aud:   "todo",
+		Sub:   string(user.Id),
+		Name:  user.FullName,
+		Roles: []string{"TODO"},
+	}
+
+	// claims := jwt.BuildClaims().
+	// 	AddIss("auth").
+	// 	AddExp(time.Now().Add(time.Second * time.Duration(ttl)).Unix()).
+	// 	AddAud("todo").
+	// 	AddSub(user.Id).
+	// 	AddName(user.FullName).
+	// 	AddRoles([]string{"TODO"})
+
+	token := jwt.Sign(claims, secret)
 
 	auth := new(Auth)
 	auth.Token = token

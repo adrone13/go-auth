@@ -11,13 +11,10 @@ JWT Claims (RFC 7519)
 https://www.iana.org/assignments/jwt/jwt.xhtml
 */
 type Claims struct {
-	// Registered claims
-	Iss string `json:"iss"` // Issuer (e.g. Auth service)
-	Exp int64  `json:"exp"` // Expiration timestamp
-	Aud string `json:"aud"` // Audience - service for which JWT is intended
-	Sub string `json:"sub"` // Subject - user identity
-
-	// Public claims
+	Iss   string   `json:"iss"` // Issuer (e.g. Auth service)
+	Exp   int64    `json:"exp"` // Expiration timestamp
+	Aud   string   `json:"aud"` // Audience - service for which JWT is intended
+	Sub   string   `json:"sub"` // Subject - user identity
 	Name  string   `json:"name"`
 	Roles []string `json:"roles"`
 }

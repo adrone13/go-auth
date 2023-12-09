@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-func TestHandler(t *testing.T) {
+func TestHealthHandler(t *testing.T) {
 	s := &server.Server{}
-	server := httptest.NewServer(http.HandlerFunc(s.IndexHandler))
+	server := httptest.NewServer(http.HandlerFunc(s.HealthHandler))
 	defer server.Close()
 	resp, err := http.Get(server.URL)
 	if err != nil {
@@ -24,7 +24,7 @@ func TestHandler(t *testing.T) {
 		t.Errorf("expected status OK; got %v", resp.Status)
 	}
 
-	expected := "{\"message\":\"Hello World\"}"
+	expected := "{\"server\":\"running 🚀\"}"
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("error reading response body. Err: %v", err)
