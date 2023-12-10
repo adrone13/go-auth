@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"time"
 
 	"auth/internal/config"
@@ -12,9 +11,9 @@ import (
 	TODO:
 	- move JWT creation into separate library (WIP)
 	- add DB implementation
-	- implement registration
+	- implement registration use case +
 	- implement refresh token storage in sessions
-	- implement JWT refreshing
+	- implement JWT refreshing use case
 	- implement logout and JWT invalidation (through cache)
 	- implement HTTP wrappers to cut boilerplate code
 */
@@ -39,9 +38,6 @@ func (c *LogInUseCase) Execute(cred Credentials) (*Auth, error) {
 	if user == nil {
 		return nil, &UserNotFoundError{}
 	}
-
-	fmt.Printf("User: %+v\n", cred)
-
 	if cred.Password != user.Password {
 		return nil, &InvalidPasswordError{}
 	}
@@ -50,21 +46,13 @@ func (c *LogInUseCase) Execute(cred Credentials) (*Auth, error) {
 	ttl := config.GetInt("JWT_TTL")
 
 	claims := jwt.Claims{
-		Iss:   "auth",
-		Exp:   time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
-		Aud:   "todo",
-		Sub:   string(user.Id),
-		Name:  user.FullName,
-		Roles: []string{"TODO"},
+		Issuer:     "auth",
+		Expiration: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
+		Audience:   "todo",
+		Subject:    string(user.Id),
+		Name:       user.FullName,
+		Roles:      []string{"TODO"},
 	}
-
-	// claims := jwt.BuildClaims().
-	// 	AddIss("auth").
-	// 	AddExp(time.Now().Add(time.Second * time.Duration(ttl)).Unix()).
-	// 	AddAud("todo").
-	// 	AddSub(user.Id).
-	// 	AddName(user.FullName).
-	// 	AddRoles([]string{"TODO"})
 
 	token := jwt.Sign(claims, secret)
 

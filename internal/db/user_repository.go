@@ -9,11 +9,10 @@ import (
 type UserRepositoryImpl struct{}
 
 /*
-	TODO:
-	For now it's just a mock
-	Need to implement integration with Postgres
+TODO:
+For now it's just a mock
+Need to implement integration with Postgres
 */
-
 func (r *UserRepositoryImpl) Insert(u *app.User) (app.UserId, error) {
 	if u.Id != "" {
 		return "", errors.New("user already exists")
@@ -22,6 +21,20 @@ func (r *UserRepositoryImpl) Insert(u *app.User) (app.UserId, error) {
 	fmt.Printf("Saved user: %+v\n", u)
 
 	return "uuid", nil
+}
+
+func (r *UserRepositoryImpl) FindById(id app.UserId) *app.User {
+	if id != "uuid" {
+		return nil
+	}
+
+	return &app.User{
+		Id:         "uuid",
+		FullName:   "Alex The Mad",
+		Email:      "alex@gmail.com",
+		Password:   "for now not hashed pass",
+		IsVerified: false,
+	}
 }
 
 func (r *UserRepositoryImpl) FindByEmail(email string) *app.User {

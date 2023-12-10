@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -16,6 +15,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(Get("/health", s.HealthHandler))
+	mux.HandleFunc(Get("/api/me", s.MeHandler))
 	mux.HandleFunc(Post("/api/login", s.LoginHandler))
 	mux.HandleFunc(Post("/api/signup", s.SignUpHandler))
 
@@ -27,6 +27,31 @@ func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	response["server"] = "running 🚀"
 
 	jsonResp, err := json.Marshal(response)
+	if err != nil {
+		log.Fatalf("error handling JSON marshal. Err: %v", err)
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResp)
+}
+
+func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
+	token, err := authenticate(w, r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
+		return
+	}
+
+	u := app.GetUserUseCase{
+		UserRepository: &db.UserRepositoryImpl{},
+	}
+	user := u.Execute(app.GetUserInput{
+		Id: app.UserId(token.Claims.Subject),
+	})
+
+	jsonResp, err := json.Marshal(user)
 	if err != nil {
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 	}
@@ -113,21 +138,4 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResp)
-}
-
-func (s *Server) ApiDataHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]string{
-		"data": "some important data",
-	}
-
-	fmt.Println(response)
-
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
 }

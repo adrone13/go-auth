@@ -3,9 +3,9 @@ package app
 type UserId string
 
 type User struct {
-	Id         UserId
-	FullName   string
-	Email      string
-	Password   string
-	IsVerified bool
+	Id         UserId `json:"id"`
+	FullName   string `json:"fullName"`
+	Email      string `json:"-"`
+	Password   string `json:"-"`
+	IsVerified bool   `json:"isVerified"`
 }

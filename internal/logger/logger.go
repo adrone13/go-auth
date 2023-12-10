@@ -2,6 +2,13 @@ package logger
 
 import "fmt"
 
+/*
+TODO:
+User log standard package instead of fmt to add timestamp, src file etc.
+
+https://stackoverflow.com/questions/60721367/how-to-log-error-without-exit-the-program-in-golang
+*/
+
 const (
 	infoColor    = "\033[1;34m%+v\033[0m"
 	noticeColor  = "\033[1;36m%+v\033[0m"

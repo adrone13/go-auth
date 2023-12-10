@@ -2,13 +2,11 @@ package server
 
 import "net/http"
 
-type handlerFunc func(http.ResponseWriter, *http.Request)
-
 /*
 TODO:
 Refactor duplication later
 */
-func Get(pattern string, handler handlerFunc) (string, handlerFunc) {
+func Get(pattern string, handler http.HandlerFunc) (string, http.HandlerFunc) {
 	return pattern, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.String() != pattern {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -23,7 +21,7 @@ func Get(pattern string, handler handlerFunc) (string, handlerFunc) {
 	}
 }
 
-func Post(pattern string, handler handlerFunc) (string, handlerFunc) {
+func Post(pattern string, handler http.HandlerFunc) (string, http.HandlerFunc) {
 	return pattern, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.String() != pattern {
 			http.Error(w, "Not found", http.StatusNotFound)

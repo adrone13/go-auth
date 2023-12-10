@@ -1,6 +1,7 @@
 package app
 
 type UserRepository interface {
-	Insert(u *User) (UserId, error)
+	Insert(*User) (UserId, error)
+	FindById(UserId) *User
 	FindByEmail(email string) *User
 }
