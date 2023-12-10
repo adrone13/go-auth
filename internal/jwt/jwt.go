@@ -10,8 +10,8 @@ import (
 )
 
 type Header struct {
-	Alg string
-	Typ string
+	Algorithm string
+	Type string
 }
 
 /*
@@ -59,6 +59,12 @@ func Parse(jwt string) (*Token, error) {
 	err := decodeBase64JSON(parts[0], header)
 	if err != nil {
 		return nil, errors.New("invalid headers")
+	}
+	if header.Algorithm != "HS256" {
+		return nil, errors.New("invalid alg")
+	}
+	if header.Type != "JWT" {
+		return nil, errors.New("invalid typ")
 	}
 
 	claims := new(Claims)
