@@ -1,10 +1,9 @@
 package server
 
 import (
+	"auth/internal/config"
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -15,7 +14,7 @@ type Server struct {
 // TODO: implement request logging (similar to middleware in Chi)
 func NewServer() *http.Server {
 	// TODO: implement Config service to manage env variables
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	port := config.GetInt("PORT")
 
 	NewServer := &Server{
 		port: port,

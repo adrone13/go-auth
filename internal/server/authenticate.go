@@ -3,9 +3,7 @@ package server
 import (
 	"auth/internal/config"
 	"auth/internal/jwt"
-	"auth/internal/logger"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -32,9 +30,6 @@ func authenticate(w http.ResponseWriter, r *http.Request) (*jwt.Token, error) {
 	if !token.IsValid(secret) {
 		return nil, errors.New("unauthorized")
 	}
-
-	fmt.Println()
-	logger.Info(fmt.Sprintf("Is token valid: %v", token.IsValid(secret)))
 
 	return token, nil
 }
