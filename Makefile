@@ -10,6 +10,11 @@ run:
 	@echo "Starting app..."
 	@go run cmd/auth/main.go
 
+# Run in watch mode
+watch:
+	@echo "Starting in watch mode..."
+	@air
+
 # Test the application
 test:
 	@echo "Testing..."
@@ -20,4 +25,4 @@ clean:
 	@echo "Cleaning..."
 	@rm -f main
 
-.PHONY: all build run test clean
+.PHONY: all build run watch test clean

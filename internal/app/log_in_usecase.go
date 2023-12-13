@@ -28,7 +28,6 @@ type Auth struct {
 	// RefreshToken string
 }
 
-// Controller constructor Constructor
 type LogInUseCase struct {
 	UserRepository UserRepository
 }
