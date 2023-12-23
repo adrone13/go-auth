@@ -94,7 +94,7 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var cred app.Credentials
 	err := json.NewDecoder(r.Body).Decode(&cred)
-	// Validate body and resulting struct
+	// Validate input struct
 	if err == io.EOF || cred.Email == "" || cred.Password == "" {
 		http.Error(w, "Invalid body", http.StatusBadGateway)
 
@@ -107,27 +107,16 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		UserRepository: &db.UserRepositoryImpl{},
 	}
 	response, err := c.Execute(cred)
-	// Handle custom UserNotFoundError with specific response
+
 	if err != nil {
-		// if _, ok := err.(*app.UserNotFoundError); ok {
-		// 	http.Error(w, "User not found", http.StatusNotFound)
-		// 	return
-		// }
-		// http.Error(w, "Bad gateway", http.StatusBadGateway)
-		// return
-
-		logger.Error("Error:", err)
-
 		switch err.(type) {
 		case *app.UserNotFoundError:
 			http.Error(w, "User not found", http.StatusNotFound)
-
-			return
 		default:
 			http.Error(w, "Bad gateway", http.StatusBadGateway)
-
-			return
 		}
+
+		return
 	}
 
 	jsonResp, err := json.Marshal(response)
@@ -136,6 +125,6 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusFound)
 	w.Write(jsonResp)
 }
