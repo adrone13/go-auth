@@ -1,21 +1,20 @@
 package main
 
 import (
+	"auth/internal/config"
 	"auth/internal/logger"
 	"auth/internal/server"
 	"fmt"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-	server := server.NewServer()
+	s := server.New(config.Values.Port)
 
 	logger.Info(
-		fmt.Sprintf("Server listening on 0.0.0.0%s", server.Addr),
+		fmt.Sprintf("Server listening on 0.0.0.0%s", s.Addr),
 	)
 
-	err := server.ListenAndServe()
+	err := s.ListenAndServe()
 	if err != nil {
 		fmt.Println("Failed to start")
 

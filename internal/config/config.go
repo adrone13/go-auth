@@ -1,37 +1,32 @@
 package config
 
 import (
-	"auth/internal/logger"
 	"fmt"
-	"os"
-	"strconv"
+	"github.com/adrone13/goenvconfig"
+	"github.com/joho/godotenv"
+	"log"
 )
 
-func GetString(k string) string {
-	v := os.Getenv(k)
-	if v == "" {
-		logger.Error(fmt.Sprintf(`ConfigService error: "%s" is not set up`, k))
+var Values *Config
 
-		panic("config validation failed")
-	}
-
-	return v
+type Config struct {
+	Port      int    `env:"PORT"`
+	JwtSecret string `env:"JWT_SECRET"`
+	JwtTtl    int    `env:"JWT_TTL"`
 }
 
-func GetInt(k string) int {
-	v := os.Getenv(k)
-	if v == "" {
-		logger.Error(fmt.Sprintf(`ConfigService error: "%s" is not set up`, k))
-
-		panic("Config validation: value not set")
-	}
-
-	converted, err := strconv.Atoi(v)
+func init() {
+	err := godotenv.Load(".env")
 	if err != nil {
-		logger.Error(fmt.Sprintf(`ConfigService error: "%s" failed to convert to int`, k))
-
-		panic("Config validation: failed to convert to int")
+		log.Fatal("Error loading .env file: ", err)
 	}
 
-	return converted
+	fmt.Println("Initializing env config")
+
+	Values = new(Config)
+
+	err = goenvconfig.Load(Values)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to load env config. Error: %v", err))
+	}
 }

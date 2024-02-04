@@ -41,8 +41,8 @@ func (c *LogInUseCase) Execute(cred Credentials) (*Auth, error) {
 		return nil, &InvalidPasswordError{}
 	}
 
-	secret := config.GetString("JWT_SECRET")
-	ttl := config.GetInt("JWT_TTL")
+	secret := config.Values.JwtSecret
+	ttl := config.Values.JwtTtl
 
 	claims := jwt.Claims{
 		Issuer:     "auth",

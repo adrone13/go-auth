@@ -27,7 +27,7 @@ func authenticate(w http.ResponseWriter, r *http.Request) (*jwt.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	secret := config.GetString("JWT_SECRET")
+	secret := config.Values.JwtSecret
 	if !token.IsValid(secret) {
 		return nil, errors.New("unauthorized")
 	}

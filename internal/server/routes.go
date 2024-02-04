@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -109,8 +110,9 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := c.Execute(cred)
 
 	if err != nil {
-		switch err.(type) {
-		case *app.UserNotFoundError:
+		var userNotFoundError *app.UserNotFoundError
+		switch {
+		case errors.As(err, &userNotFoundError):
 			http.Error(w, "User not found", http.StatusNotFound)
 		default:
 			http.Error(w, "Bad gateway", http.StatusBadGateway)
