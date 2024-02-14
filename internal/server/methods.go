@@ -2,10 +2,7 @@ package server
 
 import "net/http"
 
-/*
-TODO:
-Refactor duplication later
-*/
+// TODO: Refactor duplication later
 func Get(pattern string, handler http.HandlerFunc) (string, http.HandlerFunc) {
 	return pattern, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.String() != pattern {

@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"auth/internal/config"
-	"auth/internal/jwt"
+	"github.com/adrone13/gojwt"
 )
 
 /*
 	TODO:
-	- move JWT creation into separate library (WIP)
+	- move JWT creation into separate library +
 	- add DB implementation
 	- implement registration use case +
 	- implement refresh token storage in sessions

@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/adrone13/goenvconfig v0.0.1
+
+require github.com/adrone13/gojwt v0.0.1

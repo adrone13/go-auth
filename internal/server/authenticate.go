@@ -2,20 +2,16 @@ package server
 
 import (
 	"auth/internal/config"
-	"auth/internal/jwt"
 	"errors"
+	"github.com/adrone13/gojwt"
 	"net/http"
 	"strings"
 	"time"
 )
 
-/*
-TODO:
-Think about putting authentication into middleware
-
-https://go.dev/blog/context#TOC_3.1.
-https://stackoverflow.com/questions/51224251/authentication-using-request-vs-context
-*/
+// Think about putting authentication into middleware:
+// https://go.dev/blog/context#TOC_3.1.
+// https://stackoverflow.com/questions/51224251/authentication-using-request-vs-context
 func authenticate(w http.ResponseWriter, r *http.Request) (*jwt.Token, error) {
 	h := r.Header.Get("Authorization")
 	parts := strings.Split(h, " ")
