@@ -10,6 +10,14 @@ run:
 	@echo "Starting app..."
 	@go run cmd/auth/main.go
 
+db-run:
+	@echo "Starting db..."
+	@docker compose up
+
+db-stop:
+	@echo "Stopping db..."
+	@docker compose down
+
 # Run in watch mode
 watch:
 	@echo "Starting in watch mode..."

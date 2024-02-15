@@ -10,3 +10,6 @@ main
 
 # air
 tmp
+
+# db volume
+psql_volume
