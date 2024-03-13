@@ -13,6 +13,12 @@ type Config struct {
 	Port      int    `env:"PORT"`
 	JwtSecret string `env:"JWT_SECRET"`
 	JwtTtl    int    `env:"JWT_TTL"`
+
+	DbHost     string `env:"DB_HOST"`
+	DbName     string `env:"DB_NAME"`
+	DbUser     string `env:"DB_USER"`
+	DbPassword string `env:"DB_PASSWORD"`
+	DbPort     int    `env:"DB_PORT"`
 }
 
 func init() {
@@ -20,8 +26,6 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file: ", err)
 	}
-
-	fmt.Println("Initializing env config")
 
 	Values = new(Config)
 

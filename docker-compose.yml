@@ -1,5 +1,6 @@
 services:
-  db:
+  auth_db:
+    container_name: auth_db
     image: postgres:16
     environment:
       POSTGRES_DB: ${DB_NAME}

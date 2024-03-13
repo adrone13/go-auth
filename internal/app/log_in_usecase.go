@@ -1,6 +1,8 @@
 package app
 
 import (
+	"auth/internal/crypto"
+	"context"
 	"time"
 
 	"auth/internal/config"
@@ -10,7 +12,7 @@ import (
 /*
 	TODO:
 	- move JWT creation into separate library +
-	- add DB implementation
+	- add DB implementation +
 	- implement registration use case +
 	- implement refresh token storage in sessions
 	- implement JWT refreshing use case
@@ -32,12 +34,13 @@ type LogInUseCase struct {
 	UserRepository UserRepository
 }
 
-func (c *LogInUseCase) Execute(cred Credentials) (*Auth, error) {
-	user := c.UserRepository.FindByEmail(cred.Email)
-	if user == nil {
-		return nil, &UserNotFoundError{}
+func (c *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {
+	user, err := c.UserRepository.FindByEmail(ctx, cred.Email)
+	if err != nil {
+		return nil, err
 	}
-	if cred.Password != user.Password {
+
+	if crypto.ComparePasswordHash(cred.Password, user.Password) {
 		return nil, &InvalidPasswordError{}
 	}
 

@@ -10,6 +10,11 @@ run:
 	@echo "Starting app..."
 	@go run cmd/auth/main.go
 
+# Run in watch mode
+watch:
+	@echo "Starting in watch mode..."
+	@air
+
 db-run:
 	@echo "Starting db..."
 	@docker compose up
@@ -17,11 +22,6 @@ db-run:
 db-stop:
 	@echo "Stopping db..."
 	@docker compose down
-
-# Run in watch mode
-watch:
-	@echo "Starting in watch mode..."
-	@air
 
 # Test the application
 test:
@@ -33,4 +33,4 @@ clean:
 	@echo "Cleaning..."
 	@rm -f main
 
-.PHONY: all build run watch test clean
+.PHONY: all build run watch db-run db-stop test clean

@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -25,7 +26,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	response := make(map[string]string)
+
+	var dbStatus string
+	if err := db.Ping(r.Context()); err == nil {
+		dbStatus = "running 🚀"
+	} else {
+		dbStatus = fmt.Sprintf("Failing. Error: %s", err)
+	}
+
 	response["server"] = "running 🚀"
+	response["db"] = dbStatus
 
 	jsonResp, err := json.Marshal(response)
 	if err != nil {
@@ -40,6 +50,7 @@ func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := authenticate(w, r)
 	if err != nil {
+		logger.Error(err)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 
 		return
@@ -48,14 +59,14 @@ func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	u := app.GetUserUseCase{
 		UserRepository: &db.UserRepositoryImpl{},
 	}
-	user := u.Execute(app.GetUserInput{
-		Id: app.UserId(token.Claims.Subject),
-	})
-
-	jsonResp, err := json.Marshal(user)
+	user, err := u.Execute(r.Context(), app.UserId(token.Claims.Subject))
 	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+		http.NotFound(w, r)
+
+		return
 	}
+
+	jsonResp, _ := json.Marshal(user)
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -72,44 +83,39 @@ func (s *Server) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	useCase := &app.SignUpUseCase{
-		UserRepository: &db.UserRepositoryImpl{},
+		UserRepo: &db.UserRepositoryImpl{},
 	}
 
-	err = useCase.Execute(i)
+	err = useCase.Execute(r.Context(), i)
 	if err != nil {
 		logger.Error(err)
-
 		http.Error(w, "Bad gateway", http.StatusBadGateway)
 
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	var cred app.Credentials
 	err := json.NewDecoder(r.Body).Decode(&cred)
-	// Validate input struct
 	if err == io.EOF || cred.Email == "" || cred.Password == "" {
 		http.Error(w, "Invalid body", http.StatusBadGateway)
 
 		return
 	}
 
-	logger.Debug("Credentials:", cred)
+	logger.Debug(fmt.Sprintf("Credentials: %+v", cred))
 
-	c := &app.LogInUseCase{
+	u := &app.LogInUseCase{
 		UserRepository: &db.UserRepositoryImpl{},
 	}
-	response, err := c.Execute(cred)
+	response, err := u.Execute(r.Context(), cred)
 
 	if err != nil {
+		logger.Error(err)
+
 		var userNotFoundError *app.UserNotFoundError
 		switch {
 		case errors.As(err, &userNotFoundError):

@@ -1,13 +1,13 @@
 package app
 
 import (
+	"auth/internal/crypto"
+	"context"
 	"errors"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type SignUpUseCase struct {
-	UserRepository UserRepository
+	UserRepo UserRepository
 }
 
 type SignUpInput struct {
@@ -16,13 +16,13 @@ type SignUpInput struct {
 	Password string
 }
 
-func (u *SignUpUseCase) Execute(i SignUpInput) error {
+func (u *SignUpUseCase) Execute(ctx context.Context, i SignUpInput) error {
 	err := validateInput(i)
 	if err != nil {
 		return err
 	}
 
-	hashed, err := hashPassword(i.Password)
+	hashed, err := crypto.HashPassword(i.Password)
 	if err != nil {
 		return errors.New("failed to hash password")
 	}
@@ -34,18 +34,12 @@ func (u *SignUpUseCase) Execute(i SignUpInput) error {
 		IsVerified: false,
 	}
 
-	_, err = u.UserRepository.Insert(user)
+	err = u.UserRepo.Insert(ctx, user)
 	if err != nil {
 		return errors.New("failed to create user")
 	}
 
 	return nil
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-
-	return string(bytes), err
 }
 
 func validateInput(i SignUpInput) error {

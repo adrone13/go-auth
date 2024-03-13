@@ -1,13 +1,17 @@
 package app
 
+import "fmt"
+
 type InvalidPasswordError struct{}
 
 func (e *InvalidPasswordError) Error() string {
 	return "invalid password"
 }
 
-type UserNotFoundError struct{}
+type UserNotFoundError struct {
+	Criteria string
+}
 
 func (e *UserNotFoundError) Error() string {
-	return "User not found"
+	return fmt.Sprintf("User not found. Criteria: %s", e.Criteria)
 }

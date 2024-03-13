@@ -2,7 +2,7 @@
 
 body='{
   "email":"alex@gmail.com",
-  "password":"for now not hashed pass"
+  "password":"perfectly-safe"
 }'
 
 curl -i \
