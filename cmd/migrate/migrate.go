@@ -1,12 +1,25 @@
 package main
 
 import (
+	"auth/internal/config"
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
 	"log"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
+
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+)
+
+var url = fmt.Sprintf(
+	"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+	config.Values.DbUser,
+	config.Values.DbPassword,
+	config.Values.DbHost,
+	config.Values.DbPort,
+	config.Values.DbName,
 )
 
 func main() {
@@ -34,10 +47,30 @@ func main() {
 
 func up() {
 	fmt.Println("Migrating up")
+
+	migration, err := migrate.New("file://cmd/migrate/migrations", url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = migration.Up()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func down() {
 	fmt.Println("Migrating down")
+
+	migration, err := migrate.New("file://cmd/migrate/migrations", url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = migration.Down()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func create() {
@@ -52,7 +85,7 @@ func create() {
 
 	fmt.Println("Creating migration...")
 
-	files, err := os.ReadDir("./migrations")
+	files, err := os.ReadDir("./cmd/migrate/migrations")
 	if err != nil {
 		panic(err)
 	}
@@ -64,10 +97,8 @@ func create() {
 
 		n, err := strconv.Atoi(parts[0])
 		if err != nil {
-			panic(fmt.Sprintf("Invalid migration number: %s", parts[0]))
+			log.Fatalf("Invalid migration number: %s\n", parts[0])
 		}
-
-		fmt.Println(n, reflect.TypeOf(n))
 
 		if n > last {
 			last = n
@@ -77,13 +108,13 @@ func create() {
 	upName := fmt.Sprintf("%d_%s.up.sql", last+1, name)
 	downName := fmt.Sprintf("%d_%s.down.sql", last+1, name)
 
-	fmt.Printf("New migration name:\n\t%s\n\t%s", upName, downName)
+	fmt.Printf("Migration created:\n\t%s\n\t%s\n", upName, downName)
 
-	err = os.WriteFile(fmt.Sprintf("./migrations/%s", upName), make([]byte, 0), 0644)
+	err = os.WriteFile(fmt.Sprintf("./cmd/migrate/migrations/%s", upName), make([]byte, 0), 0644)
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile(fmt.Sprintf("./migrations/%s", downName), make([]byte, 0), 0644)
+	err = os.WriteFile(fmt.Sprintf("./cmd/migrate/migrations/%s", downName), make([]byte, 0), 0644)
 	if err != nil {
 		panic(err)
 	}

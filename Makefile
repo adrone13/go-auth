@@ -23,6 +23,18 @@ db-stop:
 	@echo "Stopping db..."
 	@docker compose down
 
+migrate-create:
+	@echo "Creating migration..."
+	@go run cmd/migrate/migrate.go create $(name)
+
+migrate-up:
+	@echo "Migrating db up..."
+	@go run cmd/migrate/migrate.go up
+
+migrate-down:
+	@echo "Migrating db down..."
+	@go run cmd/migrate/migrate.go down
+
 # Test the application
 test:
 	@echo "Testing..."
