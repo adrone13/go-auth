@@ -1,5 +1,7 @@
 package app
 
+import "time"
+
 type UserId string
 
 type User struct {
@@ -8,4 +10,6 @@ type User struct {
 	Email      string `json:"-"`
 	Password   string `json:"-"`
 	IsVerified bool   `json:"isVerified"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }

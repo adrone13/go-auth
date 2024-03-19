@@ -25,17 +25,12 @@ type Credentials struct {
 	Password string
 }
 
-type Auth struct {
-	Token string `json:"token"`
-	// RefreshToken string
-}
-
 type LogInUseCase struct {
 	UserRepository UserRepository
 }
 
-func (c *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {
-	user, err := c.UserRepository.FindByEmail(ctx, cred.Email)
+func (u *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {
+	user, err := u.UserRepository.FindByEmail(ctx, cred.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -45,21 +40,29 @@ func (c *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, er
 	}
 
 	secret := config.Values.JwtSecret
-	ttl := config.Values.JwtTtl
+	accessTtl := config.Values.JwtTtl
+	refreshTtl := config.Values.RefreshTokenAbsoluteTtl
 
-	claims := jwt.Claims{
+	access := jwt.Sign(jwt.Claims{
 		Issuer:     "auth",
-		Expiration: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
+		Expiration: time.Now().Add(time.Second * time.Duration(accessTtl)).Unix(),
 		Audience:   "todo",
 		Subject:    string(user.Id),
 		Name:       user.FullName,
 		Roles:      []string{"TODO"},
+	}, secret)
+
+	refresh := jwt.Sign(jwt.Claims{
+		Subject:    string(user.Id),
+		Expiration: time.Now().Add(time.Second * time.Duration(refreshTtl)).Unix(),
+	}, secret)
+
+	auth := &Auth{
+		AccessToken:  access,
+		TokenType:    "bearer",
+		ExpiresIn:    accessTtl,
+		RefreshToken: refresh,
 	}
-
-	token := jwt.Sign(claims, secret)
-
-	auth := new(Auth)
-	auth.Token = token
 
 	return auth, nil
 }

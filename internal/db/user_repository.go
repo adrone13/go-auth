@@ -9,9 +9,9 @@ import (
 	"log"
 )
 
-type UserRepositoryImpl struct{}
+type UserRepository struct{}
 
-func (r *UserRepositoryImpl) Insert(ctx context.Context, u *app.User) error {
+func (r *UserRepository) Insert(ctx context.Context, u *app.User) error {
 	if u.Id != "" {
 		log.Panicln("user is already inserted")
 	}
@@ -25,7 +25,7 @@ func (r *UserRepositoryImpl) Insert(ctx context.Context, u *app.User) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) FindById(ctx context.Context, id app.UserId) (*app.User, error) {
+func (r *UserRepository) FindById(ctx context.Context, id app.UserId) (*app.User, error) {
 	rows, err := conn.Query(ctx, "SELECT * FROM users WHERE id = $1 LIMIT 1", id)
 	if err != nil {
 		log.Fatalf("Failed to query: %s", err)
@@ -43,7 +43,7 @@ func (r *UserRepositoryImpl) FindById(ctx context.Context, id app.UserId) (*app.
 	return u, err
 }
 
-func (r *UserRepositoryImpl) FindByEmail(ctx context.Context, email string) (*app.User, error) {
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*app.User, error) {
 	rows, err := conn.Query(ctx, "SELECT * FROM users WHERE email = $1 LIMIT 1", email)
 	if err != nil {
 		log.Fatalf("Failed to query: %s", err)
@@ -61,7 +61,7 @@ func (r *UserRepositoryImpl) FindByEmail(ctx context.Context, email string) (*ap
 	return u, err
 }
 
-func (r *UserRepositoryImpl) FindAll(ctx context.Context) []*app.User {
+func (r *UserRepository) FindAll(ctx context.Context) []*app.User {
 	rows, err := conn.Query(ctx, "SELECT * FROM users")
 	if err != nil {
 		log.Fatalf("Failed to execute query. Error: %s", err)

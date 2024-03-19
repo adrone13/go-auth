@@ -1,7 +1,9 @@
-package tests
+package server
 
 import (
-	"auth/internal/server"
+	"auth/internal/config"
+	internalServer "auth/internal/server"
+	"auth/tests/mocks"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,9 +12,13 @@ import (
 )
 
 func TestHealthHandler(t *testing.T) {
-	s := &server.Server{}
+	config.Values = mocks.ConfigMock
+
+	s := internalServer.Server{Port: 8080, DB: &mocks.DatabaseMock{}}
+
 	server := httptest.NewServer(http.HandlerFunc(s.HealthHandler))
 	defer server.Close()
+
 	resp, err := http.Get(server.URL)
 	if err != nil {
 		t.Fatalf("error making request to server. Err: %v", err)

@@ -7,18 +7,20 @@ import (
 )
 
 type Server struct {
-	port int
+	Port int
+	DB   Database
 }
 
 // New TODO: implement request logging (similar to middleware in Chi)
-func New(port int) *http.Server {
+func New(port int, db Database) *http.Server {
 	NewServer := &Server{
-		port: port,
+		Port: port,
+		DB:   db,
 	}
 
 	// Declare Server config
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", NewServer.port),
+		Addr:         fmt.Sprintf(":%d", NewServer.Port),
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
