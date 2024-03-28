@@ -1,6 +1,7 @@
 package app
 
 import (
+	"auth/internal/app/common/repositories"
 	"auth/internal/app/sessions"
 	"auth/internal/app/tokens"
 	"auth/internal/config"
@@ -28,8 +29,8 @@ type Credentials struct {
 }
 
 type LogInUseCase struct {
-	UserRepository     UserRepository
-	SessionsRepository SessionsRepository
+	UserRepository     repositories.UserRepository
+	SessionsRepository repositories.SessionsRepository
 }
 
 func (u *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {

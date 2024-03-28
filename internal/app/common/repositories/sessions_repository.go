@@ -1,4 +1,4 @@
-package app
+package repositories
 
 import (
 	"auth/internal/app/sessions"

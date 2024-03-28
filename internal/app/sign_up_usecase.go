@@ -1,6 +1,7 @@
 package app
 
 import (
+	"auth/internal/app/common/repositories"
 	"auth/internal/app/users"
 	"auth/internal/crypto"
 	"context"
@@ -9,7 +10,7 @@ import (
 )
 
 type SignUpUseCase struct {
-	UserRepo UserRepository
+	UserRepo repositories.UserRepository
 }
 
 type SignUpInput struct {
