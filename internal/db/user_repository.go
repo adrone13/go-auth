@@ -17,10 +17,9 @@ func (r *UserRepository) Insert(ctx context.Context, u *users.User) error {
 		log.Panicln("user is already inserted")
 	}
 
-	q :=
-		`INSERT INTO users (full_name, email, password, is_verified, created_at, updated_at)
-VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
-`
+	q := `INSERT INTO users (full_name, email, password, is_verified, created_at, updated_at)
+VALUES($1, $2, $3, $4, $5, $6) RETURNING id;`
+
 	err := conn.QueryRow(
 		ctx,
 		q,
