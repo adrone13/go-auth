@@ -1,6 +1,7 @@
-package app
+package sessions
 
 import (
+	"auth/internal/app/users"
 	"auth/internal/config"
 	"log"
 	"time"
@@ -10,11 +11,24 @@ type SessionId string
 
 type Session struct {
 	Id            SessionId
-	UserId        UserId
+	UserId        users.UserId
 	RefreshTokens []string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	// https://stackoverflow.com/questions/24564619/nullable-time-time
+}
+
+func NewSession(userId users.UserId) *Session {
+	if userId == "" {
+		log.Fatalln(`"userId" should not be empty`)
+	}
+
+	return &Session{
+		UserId:        userId,
+		RefreshTokens: []string{},
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+	}
 }
 
 func (s *Session) AddRefreshToken(t string) {
@@ -31,13 +45,8 @@ func (s *Session) Expired() bool {
 	idle := config.Values.RefreshTokenIdleTtl
 
 	now := time.Now()
+	absoluteExpiration := s.CreatedAt.Add(time.Second * time.Duration(absolute))
+	idleExpiration := s.UpdatedAt.Add(time.Second * time.Duration(idle))
 
-	absoluteExpire := s.CreatedAt.Add(time.Second * time.Duration(absolute))
-	if absoluteExpire.Before(now) {
-		return false
-	}
-
-	idleExpire := s.UpdatedAt.Add(time.Second * time.Duration(idle))
-
-	return idleExpire.Before(now)
+	return absoluteExpiration.Before(now) || idleExpiration.Before(now)
 }

@@ -1,12 +1,16 @@
 package app
 
 import (
+	"auth/internal/app/sessions"
+	"auth/internal/app/tokens"
+	"auth/internal/app/users"
 	"auth/internal/config"
+	"auth/internal/logger"
 	"auth/internal/utils/arrays"
 	"context"
 	"errors"
+	"fmt"
 	jwt "github.com/adrone13/gojwt"
-	"time"
 )
 
 /*
@@ -172,10 +176,8 @@ type RefreshAuthUseCase struct {
 	SessionsRepository SessionsRepository
 }
 
-var inactivityLifetime = time.Second * 86400 // 1 day
-
 func (u *RefreshAuthUseCase) Execute(ctx context.Context, refreshToken string) (*Auth, error) {
-	token, err := jwt.Parse(refreshToken)
+	token, err := jwt.ParseCustomClaims(refreshToken, tokens.RefreshTokenClaims{})
 	if err != nil {
 		return nil, err
 	}
@@ -184,16 +186,22 @@ func (u *RefreshAuthUseCase) Execute(ctx context.Context, refreshToken string) (
 		return nil, errors.New("invalid_request")
 	}
 
-	user, err := u.UserRepository.FindById(ctx, UserId(token.Claims.Audience))
+	user, err := u.UserRepository.FindById(ctx, users.UserId(token.Claims.Subject))
 	if err != nil {
-		return nil, err
-	}
-	session, err := u.SessionsRepository.FindByUserId(ctx, user.Id)
-	if err != nil {
-		return nil, err
-	}
+		logger.Error(fmt.Sprintf("user (id: %s) does not exist", token.Claims.Subject))
 
+		return nil, err
+	}
+	session, err := u.SessionsRepository.FindById(ctx, sessions.SessionId(token.Claims.SessionId))
+	if err != nil {
+		logger.Error(fmt.Sprintf("session (id: %s) does not exist", token.Claims.SessionId))
+
+		return nil, err
+	}
 	if session.Expired() {
+		logger.Error("Logging out. Session has expired")
+
+		// Logout user if session expired
 		err = u.SessionsRepository.Delete(ctx, session.Id)
 		if err != nil {
 			return nil, err
@@ -207,8 +215,10 @@ func (u *RefreshAuthUseCase) Execute(ctx context.Context, refreshToken string) (
 	}
 
 	currentRefresh := arrays.Last(session.RefreshTokens)
-	// Logout user if invalidated refresh token received
 	if refreshToken != currentRefresh {
+		logger.Error(fmt.Sprintf("Logging out. Invalidated token provided: %s", refreshToken))
+
+		// Logout user if invalidated refresh token received
 		err = u.SessionsRepository.Delete(ctx, session.Id)
 		if err != nil {
 			return nil, err
@@ -217,46 +227,21 @@ func (u *RefreshAuthUseCase) Execute(ctx context.Context, refreshToken string) (
 		return nil, errors.New("access_denied")
 	}
 
-	access := generateAccessToken(user)
-	refresh := generateRefreshToken(user)
+	access := tokens.CreateAccessToken(user)
+	refresh := tokens.CreateRefreshToken(user, session)
 
 	session.AddRefreshToken(refresh)
-
 	err = u.SessionsRepository.Update(ctx, session)
 	if err != nil {
 		return nil, err
 	}
 
 	auth := &Auth{
-		AccessToken:  access,
+		AccessToken:  fmt.Sprintf("Bearer %s", access),
 		TokenType:    "bearer",
-		ExpiresIn:    config.Values.JwtTtl,
+		ExpiresIn:    config.Values.AccessTokenTtl,
 		RefreshToken: refresh,
 	}
 
 	return auth, nil
-}
-
-func generateAccessToken(user *User) string {
-	secret := config.Values.JwtSecret
-	ttl := config.Values.JwtTtl
-
-	return jwt.Sign(jwt.Claims{
-		Issuer:     "auth",
-		Expiration: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
-		Audience:   "todo",
-		Subject:    string(user.Id),
-		Name:       user.FullName,
-		Roles:      []string{"TODO"},
-	}, secret)
-}
-
-func generateRefreshToken(user *User) string {
-	secret := config.Values.JwtSecret
-	ttl := config.Values.RefreshTokenAbsoluteTtl
-
-	return jwt.Sign(jwt.Claims{
-		Subject:    string(user.Id),
-		Expiration: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
-	}, secret)
 }

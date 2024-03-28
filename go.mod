@@ -9,7 +9,7 @@ require (
 
 require (
 	github.com/adrone13/goenvconfig v0.0.1
-	github.com/adrone13/gojwt v0.0.1
+	github.com/adrone13/gojwt v0.1.2
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/jackc/pgx/v5 v5.5.3
 )

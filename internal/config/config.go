@@ -13,9 +13,9 @@ type Config struct {
 	JwtSecret string `env:"JWT_SECRET"`
 
 	// Might be better to move these to DB settings
-	JwtTtl                  int `env:"JWT_TTL"`                    // seconds
-	RefreshTokenAbsoluteTtl int `env:"REFRESH_ABSOLUTE_TOKEN_TTL"` // seconds
-	RefreshTokenIdleTtl     int `env:"REFRESH_IDLE_TOKEN_TTL"`     // seconds
+	AccessTokenTtl          int `env:"ACCESS_TOKEN_TTL"`           // seconds
+	RefreshTokenAbsoluteTtl int `env:"REFRESH_TOKEN_ABSOLUTE_TTL"` // seconds
+	RefreshTokenIdleTtl     int `env:"REFRESH_TOKEN_IDLE_TTL"`     // seconds
 
 	DbHost     string `env:"DB_HOST"`
 	DbName     string `env:"DB_NAME"`

@@ -10,7 +10,7 @@ import (
 
 var conn *pgxpool.Pool
 
-func init() {
+func Connect() *pgxpool.Pool {
 	var err error
 
 	url := fmt.Sprintf(
@@ -27,8 +27,6 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		os.Exit(1)
 	}
-}
 
-func Ping(ctx context.Context) error {
-	return conn.Ping(ctx)
+	return conn
 }

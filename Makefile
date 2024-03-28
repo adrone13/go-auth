@@ -17,7 +17,7 @@ watch:
 
 db-run:
 	@echo "Starting db..."
-	@docker compose up
+	@docker compose up -d
 
 db-stop:
 	@echo "Stopping db..."

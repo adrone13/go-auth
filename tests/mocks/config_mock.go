@@ -5,7 +5,7 @@ import "auth/internal/config"
 var ConfigMock = &config.Config{
 	Port:                    8080,
 	JwtSecret:               "jwt_secret",
-	JwtTtl:                  120,
+	AccessTokenTtl:          120,
 	RefreshTokenAbsoluteTtl: 1200,
 	DbHost:                  "127.0.0.1",
 	DbName:                  "auth",

@@ -8,14 +8,14 @@ import (
 
 type Server struct {
 	Port int
-	DB   Database
+	Db   Database
 }
 
 // New TODO: implement request logging (similar to middleware in Chi)
 func New(port int, db Database) *http.Server {
 	NewServer := &Server{
 		Port: port,
-		DB:   db,
+		Db:   db,
 	}
 
 	// Declare Server config

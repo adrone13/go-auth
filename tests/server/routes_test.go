@@ -14,7 +14,7 @@ import (
 func TestHealthHandler(t *testing.T) {
 	config.Values = mocks.ConfigMock
 
-	s := internalServer.Server{Port: 8080, DB: &mocks.DatabaseMock{}}
+	s := internalServer.Server{Port: 8080, Db: &mocks.DatabaseMock{}}
 
 	server := httptest.NewServer(http.HandlerFunc(s.HealthHandler))
 	defer server.Close()

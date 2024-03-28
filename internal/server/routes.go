@@ -1,6 +1,7 @@
 package server
 
 import (
+	"auth/internal/app/users"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,7 +29,7 @@ func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	response := make(map[string]string)
 
 	var dbStatus string
-	if err := s.DB.Ping(r.Context()); err == nil {
+	if err := s.Db.Ping(r.Context()); err == nil {
 		dbStatus = "running 🚀"
 	} else {
 		dbStatus = fmt.Sprintf("failing. error: %s", err)
@@ -59,7 +60,7 @@ func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	u := app.GetUserUseCase{
 		UserRepository: &db.UserRepository{},
 	}
-	user, err := u.Execute(r.Context(), app.UserId(token.Claims.Subject))
+	user, err := u.Execute(r.Context(), users.UserId(token.Claims.Subject))
 	if err != nil {
 		http.NotFound(w, r)
 
@@ -72,21 +73,6 @@ func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResp)
 }
-
-// An example successful response:
-//
-// HTTP/1.1 200 OK
-// Content-Type: application/json;charset=UTF-8
-// Cache-Control: no-store
-// Pragma: no-cache
-//
-// {
-//     "access_token":"2YotnFZFEjr1zCsicMWpAA",
-//     "token_type":"example",
-//     "expires_in":3600,
-//     "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
-//     "example_parameter":"example_value"
-// }
 
 func (s *Server) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	var i app.SignUpInput
@@ -111,6 +97,21 @@ func (s *Server) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
+// An example successful response:
+//
+// HTTP/1.1 200 OK
+// Content-Type: application/json;charset=UTF-8
+// Cache-Control: no-store
+// Pragma: no-cache
+//
+//	{
+//	    "access_token":"2YotnFZFEjr1zCsicMWpAA",
+//	    "token_type":"example",
+//	    "expires_in":3600,
+//	    "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
+//	    "example_parameter":"example_value"
+//	}
 
 func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var cred app.Credentials
