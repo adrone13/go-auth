@@ -21,6 +21,7 @@ import (
 	- implement JWT refreshing use case
 	- implement logout and JWT invalidation (through cache)
 	- implement HTTP wrappers to cut boilerplate code
+	- update logger
 */
 
 type Credentials struct {

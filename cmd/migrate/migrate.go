@@ -73,6 +73,7 @@ func down() {
 	}
 }
 
+// TODO: move new sequence number calculation to separate func
 func create() {
 	if len(os.Args) < 3 {
 		panic("Invalid args")
