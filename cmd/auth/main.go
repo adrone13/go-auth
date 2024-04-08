@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	config.Init()
 	database := db.Connect()
 	s := server.New(config.Values.Port, database)
 

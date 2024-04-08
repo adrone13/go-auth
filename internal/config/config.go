@@ -24,7 +24,7 @@ type Config struct {
 	DbPort     int    `env:"DB_PORT"`
 }
 
-func init() {
+func Init() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Failed to load .env. Error:", err)
