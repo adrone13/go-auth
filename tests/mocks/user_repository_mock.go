@@ -11,11 +11,11 @@ import (
 
 type UserRepositoryMock struct{}
 
-func (r *UserRepositoryMock) Insert(ctx context.Context, u *users.User) error {
+func (r *UserRepositoryMock) Insert(_ context.Context, _ *users.User) error {
 	return nil
 }
 
-func (r *UserRepositoryMock) FindById(ctx context.Context, id users.UserId) (*users.User, error) {
+func (r *UserRepositoryMock) FindById(_ context.Context, id users.UserId) (*users.User, error) {
 	if id != "user_uuid" {
 		return nil, &app.UserNotFoundError{Criteria: fmt.Sprintf("Id = %s", id)}
 	}
@@ -37,6 +37,6 @@ func (r *UserRepositoryMock) FindById(ctx context.Context, id users.UserId) (*us
 	}, nil
 }
 
-func (r *UserRepositoryMock) FindByEmail(ctx context.Context, email string) (*users.User, error) {
+func (r *UserRepositoryMock) FindByEmail(_ context.Context, _ string) (*users.User, error) {
 	return nil, nil
 }

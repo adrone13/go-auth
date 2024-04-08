@@ -38,7 +38,7 @@ migrate-down:
 # Test the application
 test:
 	@echo "Testing..."
-	@go test ./tests/... -v
+	@go test ./tests/app/... ./tests/server/... -v
 
 # Clean the binary
 clean:

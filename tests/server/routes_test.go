@@ -30,7 +30,7 @@ func TestHealthHandler(t *testing.T) {
 		t.Errorf("expected status OK; got %v", resp.Status)
 	}
 
-	expected := "{\"server\":\"running 🚀\"}"
+	expected := `{"db":"running 🚀","server":"running 🚀"}`
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("error reading response body. Err: %v", err)
