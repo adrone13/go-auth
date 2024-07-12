@@ -15,11 +15,7 @@ import (
 	TODO:
 	- write session id (or refresh token id) to refresh token JWT to enable multiple sessions
 	for user (for example from different devices)
-	- implement session creation in log_in_usecase
-	- implement refresh token storage in sessions
-	- implement JWT refreshing use case
 	- implement logout and JWT invalidation (through cache)
-	- implement HTTP wrappers to cut boilerplate code
 */
 
 type Credentials struct {
