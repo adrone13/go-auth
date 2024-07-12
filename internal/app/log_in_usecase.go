@@ -6,9 +6,9 @@ import (
 	"auth/internal/app/tokens"
 	"auth/internal/config"
 	"auth/internal/crypto"
+	"auth/internal/logger"
 	"context"
 	"fmt"
-	"log"
 )
 
 /*
@@ -43,7 +43,7 @@ func (u *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, er
 	session := sessions.NewSession(user.Id)
 	err = u.SessionsRepository.Insert(ctx, session)
 	if err != nil {
-		log.Printf("Failed to insert Session. Error: %s\n", err)
+		logger.Error.Printf("Failed to insert Session. Error: %s\n", err)
 
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (u *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, er
 	session.AddRefreshToken(refresh)
 	err = u.SessionsRepository.Update(ctx, session)
 	if err != nil {
-		log.Printf("Failed to update Session. Error: %s\n", err)
+		logger.Error.Printf("Failed to update Session. Error: %s\n", err)
 
 		return nil, err
 	}
