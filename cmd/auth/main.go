@@ -2,9 +2,7 @@ package main
 
 import (
 	"auth/internal/config"
-	_ "auth/internal/config"
 	"auth/internal/db"
-	_ "auth/internal/db"
 	"auth/internal/logger"
 	"auth/internal/server"
 	"fmt"
