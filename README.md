@@ -4,7 +4,7 @@ Learning project to get familiar with Go programming language utilizing __DDD__ 
 Service features:
 * Sign up/Sign in
 * Access token rotation
-* Refresh token rotation with prevention of replay attacks
+* Refresh token rotation with replay attack detection
 * Simple custom [gojwt](https://github.com/adrone13/gojwt) package
 
 ## Project structure
