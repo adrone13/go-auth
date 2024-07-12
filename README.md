@@ -10,7 +10,7 @@ Service features:
 ## Project structure
 * cmd
   * auth - app entry point
-  * migrate - migration script written using [golang-migrate](https://github.com/golang-migrate/migrate) library to make migrations part of the project rather than use external tools.
+  * migrate - migration script written using [golang-migrate](https://github.com/golang-migrate/migrate) library to make migrations part of the project rather than use external tools
 * internal
   * app - application's business logic
   * db, logger, server, etc. - projects infrustructure and various helpers
