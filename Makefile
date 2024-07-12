@@ -8,12 +8,12 @@ build:
 # Run the application
 run:
 	@echo "Starting app..."
-	@go run cmd/auth/main.go
+	@ENV=local go run cmd/auth/main.go
 
 # Run in watch mode
 watch:
 	@echo "Starting in watch mode..."
-	@air
+	@ENV=local air
 
 db-run:
 	@echo "Starting db..."

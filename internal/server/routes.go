@@ -21,6 +21,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc(Get("/api/me", s.MeHandler))
 	mux.HandleFunc(Post("/api/login", s.LoginHandler))
 	mux.HandleFunc(Post("/api/signup", s.SignUpHandler))
+	mux.HandleFunc(Post("/api/token", s.RefreshToken))
 
 	return mux
 }
@@ -148,6 +149,50 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 	}
 
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusFound)
+	w.Write(jsonResp)
+}
+
+// RefreshToken
+// POST /token HTTP/1.1
+// Host: server.example.com
+// Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+// Content-Type: application/x-www-form-urlencoded
+//
+// grant_type=refresh_token&refresh_token=tGzv3JOkF0XG5Qx2TlKWIA
+func (s *Server) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	grantType := r.URL.Query().Get("grant_type")
+	refreshToken := r.URL.Query().Get("refresh_token")
+
+	if grantType != "refresh_token" {
+		http.Error(w, "invalid_request", http.StatusBadGateway)
+
+		return
+	}
+
+	usecase := &app.RefreshAuthUseCase{
+		UserRepository:     &db.UserRepository{},
+		SessionsRepository: &db.SessionRepository{},
+	}
+
+	response, err := usecase.Execute(r.Context(), refreshToken)
+	if err != nil {
+		if err == errors.New("access_denied") {
+			http.Error(w, "access_denied", http.StatusForbidden)
+
+			return
+		} else {
+			http.Error(w, "invalid_request", http.StatusBadRequest)
+
+			return
+		}
+	}
+
+	jsonResp, err := json.Marshal(response)
+	if err != nil {
+		log.Fatalf("error handling JSON marshal. Err: %v", err)
+	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusFound)
 	w.Write(jsonResp)
