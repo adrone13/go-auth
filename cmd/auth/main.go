@@ -15,9 +15,7 @@ func main() {
 	database := db.Connect()
 	s := server.New(config.Values.Port, database)
 
-	logger.Info(
-		fmt.Sprintf("Server listening on 0.0.0.0%s", s.Addr),
-	)
+	logger.Info.Printf("Server listening on 0.0.0.0%s", s.Addr)
 
 	err := s.ListenAndServe()
 	if err != nil {

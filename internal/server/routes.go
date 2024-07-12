@@ -52,7 +52,7 @@ func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := authenticate(w, r)
 	if err != nil {
-		logger.Error(err)
+		logger.Error.Println(err)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 
 		return
@@ -90,7 +90,7 @@ func (s *Server) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = useCase.Execute(r.Context(), i)
 	if err != nil {
-		logger.Error(err)
+		logger.Error.Println(err)
 		http.Error(w, "Bad gateway", http.StatusBadGateway)
 
 		return
@@ -123,7 +123,7 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Debug(fmt.Sprintf("Credentials: %+v", cred))
+	logger.Debug.Printf("Credentials: %+v", cred)
 
 	u := &app.LogInUseCase{
 		UserRepository: &db.UserRepository{},
@@ -131,7 +131,7 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := u.Execute(r.Context(), cred)
 
 	if err != nil {
-		logger.Error(err)
+		logger.Error.Println(err)
 
 		var userNotFoundError *app.UserNotFoundError
 		switch {

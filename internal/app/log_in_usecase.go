@@ -13,7 +13,6 @@ import (
 
 /*
 	TODO:
-	- replace custom JWT library with third party to allow adding custom claims
 	- write session id (or refresh token id) to refresh token JWT to enable multiple sessions
 	for user (for example from different devices)
 	- implement session creation in log_in_usecase
@@ -21,7 +20,6 @@ import (
 	- implement JWT refreshing use case
 	- implement logout and JWT invalidation (through cache)
 	- implement HTTP wrappers to cut boilerplate code
-	- update logger
 */
 
 type Credentials struct {

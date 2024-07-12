@@ -5,7 +5,6 @@ import (
 	"auth/internal/app/users"
 	"auth/internal/config"
 	"auth/internal/logger"
-	"fmt"
 	"github.com/adrone13/gojwt"
 	"time"
 )
@@ -37,7 +36,7 @@ func CreateRefreshToken(user *users.User, session *sessions.Session) string {
 	refreshTtl := config.Values.RefreshTokenAbsoluteTtl
 
 	now := time.Now()
-	logger.Warn(fmt.Sprintf("Refresh token created: %v", now))
+	logger.Debug.Printf("Refresh token created: %v", now)
 
 	return jwt.Sign(RefreshTokenClaims{
 		Expiration: now.Add(time.Second * time.Duration(refreshTtl)).Unix(),

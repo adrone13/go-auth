@@ -39,7 +39,7 @@ func (r *SessionRepository) Update(ctx context.Context, s *sessions.Session) err
 	sessionQuery := "UPDATE sessions SET updated_at = $1 WHERE id = $2"
 	_, err = tx.Exec(ctx, sessionQuery, s.UpdatedAt, s.Id)
 	if err != nil {
-		logger.Error(err)
+		logger.Error.Println(err)
 
 		return err
 	}
@@ -47,7 +47,7 @@ func (r *SessionRepository) Update(ctx context.Context, s *sessions.Session) err
 	refreshTokenQuery := "INSERT INTO refresh_tokens (session_id, token, created_at) VALUES ($1, $2, $3)"
 	_, err = tx.Exec(ctx, refreshTokenQuery, s.Id, arrays.Last(s.RefreshTokens), s.UpdatedAt)
 	if err != nil {
-		logger.Error(err)
+		logger.Error.Println(err)
 
 		return err
 	}
