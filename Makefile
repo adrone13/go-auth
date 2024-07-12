@@ -8,16 +8,16 @@ build:
 # Run the application
 run:
 	@echo "Starting app..."
-	@go run cmd/auth/main.go
+	@ENV=local go run cmd/auth/main.go
 
 # Run in watch mode
 watch:
 	@echo "Starting in watch mode..."
-	@air
+	@ENV=local air
 
 db-run:
 	@echo "Starting db..."
-	@docker compose up
+	@docker compose up -d
 
 db-stop:
 	@echo "Stopping db..."
@@ -38,7 +38,7 @@ migrate-down:
 # Test the application
 test:
 	@echo "Testing..."
-	@go test ./tests -v
+	@go test ./tests/app/... ./tests/server/... -v
 
 # Clean the binary
 clean:

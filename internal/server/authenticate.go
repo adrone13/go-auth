@@ -12,7 +12,7 @@ import (
 // Think about putting authentication into middleware:
 // https://go.dev/blog/context#TOC_3.1.
 // https://stackoverflow.com/questions/51224251/authentication-using-request-vs-context
-func authenticate(w http.ResponseWriter, r *http.Request) (*jwt.Token, error) {
+func authenticate(_ http.ResponseWriter, r *http.Request) (*jwt.Token[jwt.Claims], error) {
 	h := r.Header.Get("Authorization")
 	parts := strings.Split(h, " ")
 	if len(parts) != 2 || parts[0] != "Bearer" {

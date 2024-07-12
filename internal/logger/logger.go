@@ -2,38 +2,17 @@ package logger
 
 import (
 	"log"
+	"os"
 )
 
-/*
-TODO:
-User log standard package instead of fmt to add timestamp, src file etc.
+// Info writes logs in the color blue with "INFO: " as prefix
+var Info = log.New(os.Stdout, "\u001b[34mINFO: \u001B[0m", log.LstdFlags|log.Lshortfile)
 
-https://stackoverflow.com/questions/60721367/how-to-log-error-without-exit-the-program-in-golang
-*/
-const (
-	infoColor    = "\033[1;34m%+v\033[0m"
-	noticeColor  = "\033[1;36m%+v\033[0m"
-	warningColor = "\033[1;33m%+v\033[0m"
-	errorColor   = "\033[1;31m%+v\033[0m"
-	debugColor   = "\033[0;36m%+v\033[0m"
-)
+// Warn writes logs in the color yellow with "WARNING: " as prefix
+var Warn = log.New(os.Stdout, "\u001b[33mWARNING: \u001B[0m", log.LstdFlags|log.Lshortfile)
 
-func Log(v any) {
-	log.Printf("%+v", v)
-}
+// Error writes logs in the color red with "ERROR: " as prefix
+var Error = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.Lshortfile)
 
-func Info(v any) {
-	log.Printf(infoColor, v)
-}
-
-func Warn(v any) {
-	log.Printf(warningColor, v)
-}
-
-func Error(v any) {
-	log.Printf(errorColor, v)
-}
-
-func Debug(v any) {
-	log.Printf(debugColor, v)
-}
+// Debug writes logs in the color cyan with "DEBUG: " as prefix
+var Debug = log.New(os.Stdout, "\u001b[36mDEBUG: \u001B[0m", log.LstdFlags|log.Lshortfile)

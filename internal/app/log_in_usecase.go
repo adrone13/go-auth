@@ -1,23 +1,19 @@
 package app
 
 import (
-	"auth/internal/crypto"
-	"context"
-	"time"
-
+	"auth/internal/app/common/repositories"
+	"auth/internal/app/sessions"
+	"auth/internal/app/tokens"
 	"auth/internal/config"
-	"github.com/adrone13/gojwt"
+	"auth/internal/crypto"
+	"auth/internal/logger"
+	"context"
+	"fmt"
 )
 
 /*
 	TODO:
-	- move JWT creation into separate library +
-	- add DB implementation +
-	- implement registration use case +
-	- implement refresh token storage in sessions
-	- implement JWT refreshing use case
-	- implement logout and JWT invalidation (through cache)
-	- implement HTTP wrappers to cut boilerplate code
+	- implement logout and JWT invalidation
 */
 
 type Credentials struct {
@@ -25,17 +21,13 @@ type Credentials struct {
 	Password string
 }
 
-type Auth struct {
-	Token string `json:"token"`
-	// RefreshToken string
-}
-
 type LogInUseCase struct {
-	UserRepository UserRepository
+	UserRepository     repositories.UserRepository
+	SessionsRepository repositories.SessionsRepository
 }
 
-func (c *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {
-	user, err := c.UserRepository.FindByEmail(ctx, cred.Email)
+func (u *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, error) {
+	user, err := u.UserRepository.FindByEmail(ctx, cred.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -44,22 +36,33 @@ func (c *LogInUseCase) Execute(ctx context.Context, cred Credentials) (*Auth, er
 		return nil, &InvalidPasswordError{}
 	}
 
-	secret := config.Values.JwtSecret
-	ttl := config.Values.JwtTtl
+	accessTtl := config.Values.AccessTokenTtl
 
-	claims := jwt.Claims{
-		Issuer:     "auth",
-		Expiration: time.Now().Add(time.Second * time.Duration(ttl)).Unix(),
-		Audience:   "todo",
-		Subject:    string(user.Id),
-		Name:       user.FullName,
-		Roles:      []string{"TODO"},
+	session := sessions.NewSession(user.Id)
+	err = u.SessionsRepository.Insert(ctx, session)
+	if err != nil {
+		logger.Error.Printf("Failed to insert Session. Error: %s\n", err)
+
+		return nil, err
 	}
 
-	token := jwt.Sign(claims, secret)
+	access := tokens.CreateAccessToken(user)
+	refresh := tokens.CreateRefreshToken(user, session)
 
-	auth := new(Auth)
-	auth.Token = token
+	session.AddRefreshToken(refresh)
+	err = u.SessionsRepository.Update(ctx, session)
+	if err != nil {
+		logger.Error.Printf("Failed to update Session. Error: %s\n", err)
+
+		return nil, err
+	}
+
+	auth := &Auth{
+		AccessToken:  fmt.Sprintf("Bearer %s", access),
+		TokenType:    "bearer",
+		ExpiresIn:    accessTtl,
+		RefreshToken: refresh,
+	}
 
 	return auth, nil
 }

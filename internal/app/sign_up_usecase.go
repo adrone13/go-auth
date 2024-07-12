@@ -1,13 +1,16 @@
 package app
 
 import (
+	"auth/internal/app/common/repositories"
+	"auth/internal/app/users"
 	"auth/internal/crypto"
 	"context"
 	"errors"
+	"fmt"
 )
 
 type SignUpUseCase struct {
-	UserRepo UserRepository
+	UserRepo repositories.UserRepository
 }
 
 type SignUpInput struct {
@@ -22,21 +25,16 @@ func (u *SignUpUseCase) Execute(ctx context.Context, i SignUpInput) error {
 		return err
 	}
 
-	hashed, err := crypto.HashPassword(i.Password)
+	hashedPassword, err := crypto.HashPassword(i.Password)
 	if err != nil {
 		return errors.New("failed to hash password")
 	}
 
-	user := &User{
-		FullName:   i.FullName,
-		Email:      i.Email,
-		Password:   hashed,
-		IsVerified: false,
-	}
+	user := users.New(i.FullName, i.Email, hashedPassword)
 
 	err = u.UserRepo.Insert(ctx, user)
 	if err != nil {
-		return errors.New("failed to create user")
+		return errors.New(fmt.Sprintf("failed to create user. error: %s", err))
 	}
 
 	return nil

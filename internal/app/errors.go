@@ -13,5 +13,5 @@ type UserNotFoundError struct {
 }
 
 func (e *UserNotFoundError) Error() string {
-	return fmt.Sprintf("User not found. Criteria: %s", e.Criteria)
+	return fmt.Sprintf("user not found by criteria: %s", e.Criteria)
 }
