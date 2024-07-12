@@ -1,20 +1,35 @@
-# Auth service written in Go lang
-The main goal of this project is to learn Go by making a service with minimal dependencies and eventually develop it in full microservice driven app.
+# Golang Auth service
+Learning project to get familiar with Go programming language utilizing __DDD__ practices and minimal dependencies.
 
-## Structure
-Go is always described to be a simple language and that any extra abstraction should be omitted, so in this project I've decided to keep abstractions minimal, for instance, using interfaces for repositories. Since I enjoy a lot of __DDD__ practices I decided to have an __Application__ layer. It is represented by `app` directory and defines entities (like `user.go`), interfaces (like `user_repository.go`) and use cases (like `log_in_usecase.go`).
+Service features:
+* Sign up/Sign in
+* Access token rotation
+* Refresh token rotation with prevention of replay attacks
+* Simple custom [gojwt](https://github.com/adrone13/gojwt) package
 
-Other directories mostly serve infrastructure functions like HTTP server, DB connection, JWT signing/parsing, etc.
+## Project structure
+* cmd
+  * auth - app entry point
+  * migrate - migration script written using [golang-migrate](https://github.com/golang-migrate/migrate) library to make migrations part of the project rather than use external tools.
+* internal
+  * app - application's business logic
+  * db, logger, server, etc. - projects infrustructure and various helpers
 
 ## Commands
 ```bash
 # build
-$ make
-$ make all
 $ make build
 
 # run
 $ make run
+$ make watch # watch mode
+
+# db
+$ make db-run         # run db docker container
+$ make db-stop        # stop db container
+$ make migrate-create # create next migration file pair (up and down)
+$ make migrate-up     # run all unapplied migrations
+$ make migrate-down   # revert all migrations
 
 # test
 make test
