@@ -99,21 +99,6 @@ func (s *Server) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// An example successful response:
-//
-// HTTP/1.1 200 OK
-// Content-Type: application/json;charset=UTF-8
-// Cache-Control: no-store
-// Pragma: no-cache
-//
-//	{
-//	    "access_token":"2YotnFZFEjr1zCsicMWpAA",
-//	    "token_type":"example",
-//	    "expires_in":3600,
-//	    "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
-//	    "example_parameter":"example_value"
-//	}
-
 func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var cred app.Credentials
 	err := json.NewDecoder(r.Body).Decode(&cred)
@@ -154,14 +139,15 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
-// RefreshToken
-// POST /token HTTP/1.1
-// Host: server.example.com
-// Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-// Content-Type: application/x-www-form-urlencoded
-//
-// grant_type=refresh_token&refresh_token=tGzv3JOkF0XG5Qx2TlKWIA
 func (s *Server) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	_, err := authenticate(w, r)
+	if err != nil {
+		logger.Error.Println(err)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
+		return
+	}
+
 	grantType := r.URL.Query().Get("grant_type")
 	refreshToken := r.URL.Query().Get("refresh_token")
 

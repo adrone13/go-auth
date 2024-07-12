@@ -15,7 +15,6 @@ type Session struct {
 	RefreshTokens []string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	// https://stackoverflow.com/questions/24564619/nullable-time-time
 }
 
 func NewSession(userId users.UserId) *Session {

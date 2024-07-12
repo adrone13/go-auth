@@ -25,12 +25,12 @@ func (u *SignUpUseCase) Execute(ctx context.Context, i SignUpInput) error {
 		return err
 	}
 
-	hashed, err := crypto.HashPassword(i.Password)
+	hashedPassword, err := crypto.HashPassword(i.Password)
 	if err != nil {
 		return errors.New("failed to hash password")
 	}
 
-	user := users.New(i.FullName, i.Email, hashed)
+	user := users.New(i.FullName, i.Email, hashedPassword)
 
 	err = u.UserRepo.Insert(ctx, user)
 	if err != nil {
